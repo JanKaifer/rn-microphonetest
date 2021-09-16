@@ -19,7 +19,7 @@ import Recording from 'react-native-recording';
 
 const App = () => {
   const [lastData, setLastData] = useState(null);
-  const [isRecording, setIsRecording] = useState(true);
+  const [isRecording, setIsRecording] = useState(false);
 
   useEffect(() => {
     if (isRecording) {
@@ -32,7 +32,7 @@ const App = () => {
 
       const listener = Recording.addRecordingEventListener(data => {
         console.log(data);
-        setLastData(data);
+        setLastData(data.slice(0, 10));
       });
 
       Recording.start();
@@ -48,7 +48,10 @@ const App = () => {
   return (
     <SafeAreaView>
       <View>
-        <Button onPress={() => setIsRecording(!isRecording)} />
+        <Button
+          onPress={() => setIsRecording(!isRecording)}
+          title={isRecording ? 'Disable' : 'Enable'}
+        />
         <Text>{JSON.stringify(lastData)}</Text>
       </View>
     </SafeAreaView>
