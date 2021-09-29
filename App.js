@@ -8,7 +8,14 @@
 
 import React, {useEffect} from 'react';
 import {useState} from 'react';
-import {Button, SafeAreaView, Text, View} from 'react-native';
+import {
+  Button,
+  SafeAreaView,
+  Text,
+  View,
+  NativeModules,
+  NativeEventEmitter,
+} from 'react-native';
 
 import {PermissionsAndroid} from 'react-native';
 import Recording from 'react-native-recording';
@@ -22,27 +29,37 @@ const App = () => {
   const [isRecording, setIsRecording] = useState(false);
 
   useEffect(() => {
-    if (isRecording) {
-      Recording.init({
-        bufferSize: 4096,
-        sampleRate: 44100,
-        bitsPerChannel: 16,
-        channelsPerFrame: 1,
-      });
+    // instantiate the event emitter
+    const CounterEvents = new NativeEventEmitter(
+      NativeModules.MicrophoneRecording,
+    );
+    // subscribe to event
+    CounterEvents.addListener('onRecording', res =>
+      console.log('onRecording event', res),
+    );
 
-      const listener = Recording.addRecordingEventListener(data => {
-        console.log(data);
-        setLastData(data.slice(0, 10));
-      });
+    NativeModules.MicrophoneRecording.toggleMicTap();
+    // if (isRecording) {
+    //   Recording.init({
+    //     bufferSize: 4096,
+    //     sampleRate: 44100,
+    //     bitsPerChannel: 16,
+    //     channelsPerFrame: 1,
+    //   });
 
-      Recording.start();
+    //   const listener = Recording.addRecordingEventListener(data => {
+    //     console.log(data);
+    //     setLastData(data.slice(0, 10));
+    //   });
 
-      return () => {
-        Recording.stop();
-        listener.remove();
-        setLastData(null);
-      };
-    }
+    //   Recording.start();
+
+    //   return () => {
+    //     Recording.stop();
+    //     listener.remove();
+    //     setLastData(null);
+    //   };
+    // }
   }, [isRecording]);
 
   return (
